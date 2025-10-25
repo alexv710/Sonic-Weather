@@ -60,9 +60,9 @@ export default function TimelineChart({ data, selectedDate }: TimelineChartProps
   const selectedTimestamp = selectedDate?.getTime();
 
   return (
-    <div style={{ width: '100%', height: 380, minHeight: 0 }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <ResponsiveContainer>
-        <LineChart data={chartData} margin={{ top: 24, right: 24, left: 0, bottom: 0 }}>
+        <LineChart data={chartData} margin={{ top: 24, right: 10, left: 0, bottom: 20 }}>
           <XAxis
             dataKey="date"
             type="number"
