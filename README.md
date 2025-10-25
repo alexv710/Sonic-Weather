@@ -38,3 +38,19 @@ The frontend will be built with **TypeScript** for improved type safety and deve
             * **Rainfall:** Encoded as a **pulsing blue ring** using a `ScatterplotLayer` rendered at the base of the column. The ring is only visible on days with precipitation, and its animation speed or opacity is proportional to the amount of rainfall, providing a clear, dynamic signal.
     * **`TimelineChart (recharts)`:** A line chart that displays the national average `danceability` and `valence` of songs over time. It will be synchronized with the map, and a vertical line will indicate the currently selected date.
 
+## Setup
+
+This repo uses react for the frontend part and uv/python for the data processing part.
+
+```bash
+pnpm create vite@latest my-app -- --template react
+
+uv init
+```
+
+## Data Loading
+
+Spotify data is loaded from Kaggle datasets using the `kagglehub` library. The processed data is saved in the `frontend/public/data` directory for easy access by the frontend application.
+
+### Preview
+![Spotify Data Preview](spotify_data.png)
