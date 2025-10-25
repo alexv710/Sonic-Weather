@@ -22,7 +22,7 @@ END_DATE = pd.to_datetime("2021-12-31T23:59:59Z")
 # rre150d0 Millimeter Niederschlag; Tagessumme 0540 - 0540 Folgetag
 # sre000d0 Minuten Sonnenscheindauer; Tagessumme
 # sremaxdv Prozent Sonnenscheindauer; relativ zur absolut möglichen Tagessumme
-SELECT_COLUMNS = ['station_abbr', 'reference_timestamp', 'tre200d0_7d', 'rre150d0_7d', 'sre000d0_7d']
+SELECT_COLUMNS = ['station_abbr', 'date', 'tre200d0_7d', 'rre150d0_7d', 'sre000d0_7d']
 
 def ingest_weather() -> None:
 
@@ -61,6 +61,7 @@ def ingest_weather() -> None:
                     date_format='%d.%m.%Y %H:%M'
                 )
                 df['reference_timestamp'] = df['reference_timestamp'].dt.tz_localize('UTC')
+                df['date'] = df['reference_timestamp'].dt.date
                 df = df[(df['reference_timestamp'] >= START_DATE) & (df['reference_timestamp'] <= END_DATE)]
                 df.reset_index(drop=True, inplace=True)
                 df['tre200d0_7d'] = df['tre200d0'].rolling(window=7, min_periods=1, center=True).mean().round(2)

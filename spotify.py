@@ -54,7 +54,7 @@ def load_spotify_features() -> pd.DataFrame:
             pandas_kwargs={"usecols": FEATURE_COLS}
         )
         pbar.update(1)
-        
+
     return df_tracks
 
 # --------------------------------
@@ -74,6 +74,28 @@ def ingest_songs() -> None:
     # Drop all without streams
     merged = merged.dropna(subset=['streams'])
 
+    merged['acousticness_weighted'] = merged['acousticness'] * merged['streams']
+    merged['danceability_weighted'] = merged['danceability'] * merged['streams']
+    merged['energy_weighted'] = merged['energy'] * merged['streams']
+
+    merged['date'] = pd.to_datetime(merged['date']).dt.date
+
+    daily_summary = merged.groupby('date').agg(
+        # Sum of (feature * weight)
+        acousticness_sum=pd.NamedAgg(column='acousticness_weighted', aggfunc='sum'),
+        danceability_sum=pd.NamedAgg(column='danceability_weighted', aggfunc='sum'),
+        energy_sum=pd.NamedAgg(column='energy_weighted', aggfunc='sum'),
+        # Sum of weights (total streams)
+        total_streams=pd.NamedAgg(column='streams', aggfunc='sum')
+    )
+
+    daily_summary['acousticness'] = daily_summary['acousticness_sum'] / daily_summary['total_streams']
+    daily_summary['danceability'] = daily_summary['danceability_sum'] / daily_summary['total_streams']
+    daily_summary['energy'] = daily_summary['energy_sum'] / daily_summary['total_streams']
+
+    final_cols = ['acousticness', 'danceability', 'energy', 'total_streams']
+    merged = daily_summary[final_cols].reset_index()
+
     # Use tqdm to indicate the final save (disk write)
     with tqdm(desc="Saving to Parquet", total=1, bar_format="{desc}: {n_fmt}/{total_fmt}") as pbar:
         output_path_public = os.path.join(OUTPUT_DIR_PUBLIC, 'swiss_charts_enriched.parquet')
@@ -82,4 +104,5 @@ def ingest_songs() -> None:
         
     print(f"\nSpotify Features Data loaded. Shape: {df_tracks.shape}")
     print(f"Final Merged Data saved to: {output_path_public}")
+    
     print(merged.head())
