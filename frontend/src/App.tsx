@@ -111,7 +111,6 @@ function App() {
         <MapVisualization
           stations={stationMap}
           weather={meteoData as any} 
-          dailyWeather={dailyWeatherMock as any}
           selectedDate={meteoData[50]?.date} 
         />
         </div>

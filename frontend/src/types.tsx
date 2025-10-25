@@ -17,7 +17,7 @@ export interface WeatherDailySummary {
 }
 
 export interface MusicDaily {
-  date: Date
+  date: string
   totalStreams: number
   count: number
   energy: number | null
