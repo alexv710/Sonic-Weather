@@ -3,24 +3,9 @@ import DeckGL from '@deck.gl/react';
 import Map from 'react-map-gl/maplibre';
 import * as maplibre from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
-export interface Station {
-    id: string;
-    lon: number;
-    lat: number;
-    title: string;
-}
-export interface WeatherRecord {
-    station_abbr: string;
-    reference_timestamp: string;
-    tre200d0_7d: number;
-    rre150d0_7d: number;
-    sre000d0_7d: number;
-    rre150d0: number;
-}
-export interface WeatherDailySummary {
-    meanSunshine: number | null;
-}
+import type { Station } from '../types/station';
+import type { WeatherRecord } from '../types/weather';
+import type { WeatherDailySummary } from '../types/weatherDailySummary';
 
 type MapLibreModule = typeof maplibre & { default?: typeof maplibre }
 const resolvedMaplibre = (maplibre as MapLibreModule).default ?? maplibre
@@ -57,21 +42,27 @@ export default function MapVisualization({
   selectedDate
 }: MapVisualizationProps) {
 
-    console.log("MapVisualization props:", { stations, weather, dailyWeather, selectedDate });
-
   const layers = useMemo(() => [], []); 
 
   return (
     <DeckGL
-    initialViewState={DEFAULT_VIEW}
-    controller={STATIC_CONTROLLER}
-    layers={layers}
+    style={{
+        height: '100%',
+        width: '100%',
+        position: 'relative',
+        borderRadius: '24px',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        overflow: 'hidden'
+      }}
+      initialViewState={DEFAULT_VIEW}
+      controller={STATIC_CONTROLLER}
+      layers={layers}
     >
-    <Map
+      <Map
         mapLib={resolvedMaplibre}
         mapStyle="https://api.maptiler.com/maps/dataviz/style.json?key=0zLRN18KJ7iEQRPNKDlo"
         interactive={false}
-    />
+      />
     </DeckGL>
   )
 }
