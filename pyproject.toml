@@ -8,6 +8,7 @@ dependencies = [
     "kagglehub>=0.3.13",
     "pandas>=2.3.3",
     "pyarrow>=22.0.0",
+    "pystac-client>=0.9.0",
 ]
 
 [tool.setuptools]

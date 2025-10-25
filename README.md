@@ -52,5 +52,14 @@ uv init
 
 Spotify data is loaded from Kaggle datasets using the `kagglehub` library. The processed data is saved in the `frontend/public/data` directory for easy access by the frontend application.
 
-### Preview
+### Spotify Data Preview
+
 ![Spotify Data Preview](spotify_data.png)
+---
+### Meteo Stations Data Preview
+
+![Meteo Stations Data Preview](stations_data.png)
+
+### Meteo Weather Data Preview
+
+![Meteo Weather Data Preview](weather_data.png)
