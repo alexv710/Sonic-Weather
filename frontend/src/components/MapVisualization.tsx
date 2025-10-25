@@ -67,7 +67,6 @@ export default function MapVisualization({
   }, [selectedDate, weather])
 
   const glyphs: GlyphDatum[] = useMemo(() => {
-    console.log('Generating glyphs for dateKey:', dateKey)
     if (!dateKey) return []
     const rows = weather.filter((w) => String(w.date.toISOString().slice(0, 10)) === dateKey)
     return rows

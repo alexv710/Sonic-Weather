@@ -40,3 +40,14 @@ html, body, #root {
     margin-left: auto;
     
 }
+
+.scrub-section {
+    /* This is the track for our timeline scroll */
+    justify-content: space-between;
+    align-items: stretch;
+    padding-top: 20vh;
+    height: 140vh;
+    /* Ensure it has a z-index so it scrolls "over" the sticky stage */
+    position: relative;
+    z-index: 2;
+}
