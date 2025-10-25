@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      hyparquet:
+        specifier: ^1.20.1
+        version: 1.20.1
       react:
         specifier: ^19.1.1
         version: 19.2.0
@@ -811,6 +814,9 @@ packages:
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
+
+  hyparquet@1.20.1:
+    resolution: {integrity: sha512-3A7cnSQDFcmbs+kljXNhXn0O2/8aNJgkS1Tjwd5jLEIaRxmjO+TtxNWAfl72ab4YjYMpxv1TPVjOTJsfNdaeDg==}
 
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
@@ -1862,6 +1868,8 @@ snapshots:
   graphemer@1.4.0: {}
 
   has-flag@4.0.0: {}
+
+  hyparquet@1.20.1: {}
 
   ignore@5.3.2: {}
 
