@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   ReferenceArea,
+  Legend,
   Label,
   Line
 } from 'recharts'
@@ -52,7 +53,7 @@ export default function TimelineChart({ data, selectedDate }: TimelineChartProps
   const lockdown1 = COVID_EVENTS.LOCKDOWN_1.getTime();
   const lockdown2 = COVID_EVENTS.LOCKDOWN_2.getTime();
 
-  const christmasDates = ['2018', '2019', '2020', '2021', '2022'].map(year => ({
+  const christmasDates = ['2017', '2018', '2019', '2020', '2021'].map(year => ({
     year,
     time: new Date(`${year}-12-25T00:00:00Z`).getTime()
   }));
@@ -83,6 +84,7 @@ export default function TimelineChart({ data, selectedDate }: TimelineChartProps
             contentStyle={{ backgroundColor: '#2a1d1dff' }}
             labelFormatter={(label) => formatTimestamp(label as number)}
           />
+          <Legend wrapperStyle={{ paddingTop: 20 }} />
 
           {selectedTimestamp && (
             <ReferenceLine
@@ -124,7 +126,8 @@ export default function TimelineChart({ data, selectedDate }: TimelineChartProps
               strokeWidth={1}
               strokeDasharray="2 2"
             >
-              <Label value="🎄" position="top" fill="#f1faee" fontSize={12} />
+
+              <Label value="Christmas 🎄" position="bottom" fill="#37d104ff" fontSize={12} />
             </ReferenceLine>
           ))}
         </LineChart>
