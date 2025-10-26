@@ -3,6 +3,7 @@ import { asyncBufferFromUrl, parquetReadObjects } from 'hyparquet';
 import MapVisualization from './components/MapVisualization';
 import './App.css';
 import TimelineChart from './components/TimelineChart';
+import SunshineVisualization from './components/SunshineVisualization';
 
 // Interfaces must be defined here for the data returned by Hyparquet
 // These match the required types of the MapVisualization component.
@@ -52,7 +53,30 @@ function App() {
   const STATIONS_PATH = '/data/stations.parquet';
   const CHARTS_PATH = '/data/swiss_charts_enriched.parquet';
 
-const availableDates = useMemo(
+  const sunshineMinMax = useMemo(() => {
+    let min = Infinity;
+    let max = -Infinity;
+
+    for (let i = 0; i < meteoData.length; i++) {
+      const v = meteoData[i].sre000d0_7d;
+      if (!Number.isFinite(v)) continue;
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+
+    // Fallbacks in case everything was filtered out
+    if (min === Infinity) min = 0;
+    if (max === -Infinity) max = 1;
+
+    return { min, max };
+  }, [meteoData]);
+
+  const sunshineForDate = useMemo(
+    () => meteoData.filter(d => d.date === selectedDate).map(d => d.sre000d0_7d),
+    [meteoData, selectedDate]
+  );
+
+  const availableDates = useMemo(
     () =>
       Array.from(new Set(meteoData.map((d) => d.date))).sort(
         (a, b) => new Date(a).getTime() - new Date(b).getTime()
@@ -62,7 +86,7 @@ const availableDates = useMemo(
 
   const onScroll = useCallback(() => {
     const scrubEl = scrubSectionRef.current
-    
+
     // Ensure the element and dates are available
     if (!scrubEl || availableDates.length === 0) return
 
@@ -73,7 +97,7 @@ const availableDates = useMemo(
 
     // Calculate the start and end points for the scroll animation
     // Start: When the top of the scrub section hits the top of the viewport (top = 0)
-    const scrollStart = 0; 
+    const scrollStart = 0;
     // End: When the bottom of the scrub section hits the bottom of the viewport
     // adding the visRefHeight as it is set to sticky
     const scrollEnd = viewportHeight - scrubHeight - visRefHeight;
@@ -184,6 +208,11 @@ const availableDates = useMemo(
       {/* SCROLLING CONTENT CONTAINER WITH STORY POINTS */}
       <section className="scrub-section" ref={scrubSectionRef}>
         <div className="story-point">
+          <SunshineVisualization
+            valuesForDate={sunshineForDate}
+            globalMin={sunshineMinMax.min}
+            globalMax={sunshineMinMax.max}
+          />
           <h3>A Recurring Pattern</h3>
           <p>
             As we start in 2017, watch the timeline. We immediately see a pattern that repeats every
