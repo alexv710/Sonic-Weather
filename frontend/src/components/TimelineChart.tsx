@@ -74,9 +74,9 @@ export default function TimelineChart({ data, selectedDate }: TimelineChartProps
           />
           <YAxis domain={[0, 1]} />
 
-          <Line type="monotone" dataKey="energy" stroke="#8884d8" dot={false} />
-          <Line type="monotone" dataKey="acousticness" stroke="#82ca9d" dot={false} />
-          <Line type="monotone" dataKey="danceability" stroke="#ffc658" dot={false} />
+          <Line type="monotone" dataKey="energy" stroke="#8884d8" dot={false} isAnimationActive={false} />
+          <Line type="monotone" dataKey="acousticness" stroke="#82ca9d" dot={false} isAnimationActive={false}/>
+          <Line type="monotone" dataKey="danceability" stroke="#ffc658" dot={false} isAnimationActive={false} />
 
           <Tooltip
             contentStyle={{ backgroundColor: '#2a1d1dff' }}
