@@ -1,3 +1,30 @@
+<div align="center">
+
+# Sonic Weather
+
+**Live Preview**  
+<a href="https://sonic-weather.vercel.app/" target="_blank">https://sonic-weather.vercel.app/</a>
+
+</div>
+
+---
+
+## Quick Start (Local Build & Preview)
+
+```bash
+# from repo root
+cd frontend
+
+# install deps
+pnpm install
+
+# build for production
+pnpm build
+
+# preview the production build (Vite preview)
+pnpm preview -- --host
+# open the printed URL (typically http://localhost:4173)
+```
 ### ## Project Specification: "Sonic Weather"
 
 This document details the implementation of "Sonic Weather," an interactive data visualization exploring the correlation between the mood of popular music and weather patterns across Switzerland.
