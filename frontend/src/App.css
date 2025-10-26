@@ -4,6 +4,7 @@
   padding-left: 2rem;
   padding-right: 2rem;
   text-align: center;
+  --rain-color: #4dafff;
 }
 
 html, body, #root {
@@ -12,17 +13,46 @@ html, body, #root {
   margin: 0;
 }
 
+.intro {
+  margin-top: 20vh;
+  min-height: 50vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 10;
+  background-color: rgba(20, 20, 20, 0.8);
+  border: 1px solid #444;
+}
+
+.outro {
+  margin-bottom: 20px;
+  width: 60vw;
+  display: grid;
+  place-content: center;
+  place-self: center;
+  place-items: center;
+  position: relative;
+  z-index: 10;
+  background-color: rgba(20, 20, 20, 0.8);
+  border: 1px solid #444;
+  padding-bottom: 1px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid transparent;
+}
+
+.outro h3 {
+  margin-top: 0;
+  color: var(--accent);
+}
+
 .stage {
-  /* This is the key for the sticky effect */
   position: sticky;
   top: 0;
   height: 100vh;
   width: 100%;
   z-index: 10;
   margin: 0;
-  /* Place it behind the content */
 
-  /* Layout for map and chart inside the stage */
   display: flex;
   flex-direction: column;
   align-content: center;
@@ -32,79 +62,202 @@ html, body, #root {
   border-radius: 20px;
 }
 
-.timeline-chart {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    width: 100%;
-    margin-top: 20px;
-    height: 40vh;
+.map-visualization.is-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+  transition: all 1s;
+}
 
-    padding-bottom: 20px;
-    margin-left: 0
+.map-visualization.is-hidden {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateX(200%);
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
 }
 
 .map-visualization {
-    flex: 1;
-    min-height: 0;
-    width: 60vw;
-    height: 40vh;
-    opacity: 1;
-    transition: opacity 0.5s ease-in-out;
-    margin-left: auto;
-    
+  margin-top: 2rem;
+  flex: 1;
+  min-height: 0;
+  width: 60vw;
+  height: 40vh;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+  margin-left: auto;
+  transition: all 1s;
 }
 
-.spacer-1,
-.spacer-2,
-.spacer-3 {
-  /* This is the value you will "hand-tune" */
-  /* Start with something large and adjust */
-  height: 60vh; 
+.timeline-chart {
+  background-color: var(--bg-color);
+  color: var(--text-color);
   width: 100%;
+  margin-top: 20px;
+  height: 40vh;
+  padding-bottom: 20px;
+  margin-left: 0;
+  transition: all 1s;
+}
+
+.timeline-pre {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateX(-100%);
+  visibility: hidden;
+}
+
+.timeline-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.timeline-post {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(-100%);
+  visibility: hidden;
 }
 
 .scrub-section {
-    /* This is the track for our timeline scroll */
-    width: 30vw;
-    justify-content: space-between;
-    align-items: stretch;
-    padding-top: 20vh;
-    /* Ensure it has a z-index so it scrolls "over" the sticky stage */
-    position: relative;
-    z-index: 2;
+  width: 30vw;
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .story-point {
-  /* Make it stand out */
+  position: absolute;
+  top: 10vh;
+  left: 0;
+  width: 30vw;
   background-color: rgba(20, 20, 20, 0.8);
   border: 1px solid #444;
   border-radius: 8px;
   padding: 1.5rem;
-  
-  /* Text alignment */
   text-align: left;
-  
-  /* Give it some vertical breathing room */
   min-height: 20vh;
+  z-index: -10;
 
-  /* This helps it fade in/out nicely if you add transitions */
-  opacity: 1; 
+  transition: transform 1s ease-in-out,
+  opacity 1s ease-in-out,
+  filter 1s ease-in-out;
 }
 
-/* .story-point {
-  max-width: 30vh;
-  padding: 1.5rem 1rem;
-  background: var(--bg);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  z-index: -5;
-} */
+.story-point.story--sunshine {
+  top: 35vh;
+  height: 5vh;
+
+  border: none;
+  background: none;
+}
+
+.story-pre {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateX(-100%);
+  visibility: hidden;
+}
+
+.story-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.story-post {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateX(100%);
+}
 
 .story-point h3 {
   margin-top: 0;
   color: var(--accent);
-}.sunshine-sticky {
+}
+
+.rain-legend {
+  position: absolute;
+  left: 0;
+
+  top: 20vh;;
+  width: 28vw;
+  padding: 0.9rem 1rem;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  background: rgba(16, 16, 16, 0.9);
+  backdrop-filter: blur(4px);
+  z-index: 6;
+  pointer-events: none;
+
+  transition:
+  opacity 0.6s ease,
+  transform 0.6s ease,
+  visibility 0s linear 0.6s;
+  opacity: 0;
+  transform: translateY(10px);
+  visibility: hidden;
+}
+
+.rain-legend.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  transition-delay: 0s, 0s, 0s;
+}
+
+.legend-title {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+  opacity: 0.9;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.35rem 0;
+}
+
+.legend-text { text-align: left; }
+.legend-sub { font-size: 0.8rem; opacity: 0.75; }
+
+.ring {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--rain-color) inset, 0 0 12px rgba(77,175,255,.35);
+}
+
+.ring--small {
+  transform: scale(0.75);
+  opacity: 0.7;
+}
+
+.ring--pulse {
+  position: relative;
+}
+.ring--pulse::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--rain-color) inset;
+  opacity: 0.6;
+  animation: ringPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+  0%   { transform: scale(0.9); opacity: 0.8; }
+  70%  { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
 .sunshine-sticky {
   position: static;
   width: 100%;

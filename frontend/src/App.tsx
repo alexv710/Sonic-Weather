@@ -46,7 +46,9 @@ function App() {
   const [chartsData, setChartsData] = useState<ChartsData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
+  const [progress, setProgress] = useState(-100);
+
   const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined)
 
   const METEO_PATH = '/data/meteo_swiss_filtered.parquet';
@@ -102,16 +104,18 @@ function App() {
     // adding the visRefHeight as it is set to sticky
     const scrollEnd = viewportHeight - scrubHeight - visRefHeight;
     const scrollDistance = scrollEnd - scrollStart
-    
+
+    // use the progress of the scroll to determine both the visibility and the data selection
+    const newProgress = (scrubRect.top - scrollStart - visRefHeight) / scrollDistance;
+
     // If the scrub section is shorter than the viewport, this logic won't work.
     // We assume it's taller, which it is due to the spacers.
-    if (scrollDistance >= 0) return; 
-    const progress = (scrubRect.top - scrollStart - visRefHeight) / scrollDistance;
-    const clampedProgress = Math.max(0, Math.min(1, progress))
+    if (scrollDistance >= 0) return;
+    const clampedProgress = Math.max(0, Math.min(1, newProgress))
     const dateIndex = Math.floor(clampedProgress * (availableDates.length - 1))
     const newDate = availableDates[dateIndex]
     setSelectedDate(newDate)
-
+    setProgress(newProgress)
   }, [availableDates])
 
 
@@ -193,37 +197,69 @@ function App() {
 
       <div className="stage" ref={visRef}>
 
-        <div className="map-visualization">
+        <div className={`map-visualization ${progress > -0.13 ? 'is-visible' : 'is-hidden'}`}>
           <MapVisualization
             stations={stationMap}
             weather={meteoData as any}
             selectedDate={selectedDate}
           />
         </div>
-        <div className="timeline-chart">
+        <div className={`timeline-chart ${progress < 0 ? 'timeline-pre' : (progress < 0.95 ? 'timeline-visible' : 'timeline-post')}`}>
           <TimelineChart data={chartsData} selectedDate={selectedDate} />
         </div>
-      </div>
 
-      {/* SCROLLING CONTENT CONTAINER WITH STORY POINTS */}
-      <section className="scrub-section" ref={scrubSectionRef}>
-        <div className="story-point">
+        <div
+          className={`story-point story--sunshine ${
+            progress < 0.0 ? 'story-pre' : (progress < 0.95 ? 'story-visible' : 'story-post')
+          }`}
+        >
           <SunshineVisualization
             valuesForDate={sunshineForDate}
             globalMin={sunshineMinMax.min}
             globalMax={sunshineMinMax.max}
           />
+        </div>
+
+        <div className={`story-point ${progress < -0.1 ? 'story-pre' : (progress < 0.12 ? 'story-visible' : 'story-post')
+          }`}>
+          <div className="legend-title">How rain is encoded</div>
+
+          <div className="legend-row">
+            <span className="ring ring--pulse" />
+            <div className="legend-text">
+              <strong>More rain</strong>
+              <div className="legend-sub">Pulsing ring means heavy precipitation at that station</div>
+            </div>
+          </div>
+
+          <div className="legend-row">
+            <span className="ring ring--small" />
+            <div className="legend-text">
+              <strong>Less rain</strong>
+              <div className="legend-sub">Small, faint ring means light precipitation</div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div className={`story-point ${progress < 0.13 ? 'story-pre' : (progress < 0.24 ? 'story-visible' : 'story-post')
+          }`}>
           <h3>A Recurring Pattern</h3>
           <p>
             As we start in 2017, watch the timeline. We immediately see a pattern that repeats every
             year: a sharp dip in "danceability" in December, followed by a quick recovery in the
             new year.
           </p>
+
+          <p>
+            Is this the "christmas effect," where people gravitate towards less danceable music during the
+            holiday season? Or could it be linked to the colder, darker weather typical of Swiss winters?
+          </p>
         </div>
 
-        <div className="spacer-1"></div>
-
-        <div className="story-point">
+        <div className={`story-point ${progress < 0.245 ? 'story-pre' : (progress < 0.38 ? 'story-visible' : 'story-post')
+          }`}>
           <h3>The Record Heat of 2018</h3>
           <p>
             Summer 2018 was one of the hottest on record in Switzerland. As the heatwaves hit
@@ -232,9 +268,8 @@ function App() {
           </p>
         </div>
 
-        <div className="spacer-2"></div>
-
-        <div className="story-point">
+        <div className={`story-point ${progress < 0.385 ? 'story-pre' : (progress < 0.6 ? 'story-visible' : 'story-post')
+          }`}>
           <h3>A Stable 2019 Ends in a Slump</h3>
           <p>
             The first half of 2019 appears remarkably stable for both energy and danceability.
@@ -243,16 +278,27 @@ function App() {
           </p>
         </div>
 
-        <div className="spacer-3"></div>
-
-        <div className="story-point">
+        <div className={`story-point ${progress < 0.605 ? 'story-pre' : (progress < 0.9 ? 'story-visible' : 'story-post')
+          }`}>
           <h3>The COVID-19 Effect</h3>
           <p>
             The arrival of the pandemic in 2020 brought erratic listening patterns. Lockdowns and
             uncertainty seem to correlate with a desire for higher "energy" music, while
             "danceability" saw a significant drop.
           </p>
+          <p>
+            The pandemic seems to have disrupted normal seasonal trends and led to a erratic musical
+            landscape. Nevertheless the christmas
+          </p>
         </div>
+      </div>
+
+      {/* SCROLLING CONTENT CONTAINER WITH STORY POINTS */}
+      <section className="scrub-section" ref={scrubSectionRef}>
+        <div className="spacer" style={{ height: '100vh' }}></div>
+        <div className="spacer" style={{ height: '100vh' }}></div>
+        <div className="spacer" style={{ height: '100vh' }}></div>
+        <div className="spacer" style={{ height: '100vh' }}></div>
       </section>
 
       <section className="outro" ref={outroRef}>
@@ -275,6 +321,7 @@ function App() {
           <li>Adding more data sources, like mobility reports or social media sentiment.</li>
         </ul>
       </section>
+      <div className="spacer" style={{ height: '5vh' }}></div>
     </div>
   );
 }
