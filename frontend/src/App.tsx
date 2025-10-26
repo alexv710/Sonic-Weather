@@ -16,7 +16,7 @@ interface Station {
 
 interface MeteoData {
   station_abbr: string;
-  date: string;
+  date: Date;
   tre200d0_7d: number;
   rre150d0_7d: number;
   sre000d0_7d: number;
@@ -27,7 +27,7 @@ interface ChartsData {
   track_id: string;
   title: string;
   streams: number;
-  date: string;
+  date: Date;
   acousticness: number;
   danceability: number;
   energy: number;
@@ -49,7 +49,7 @@ function App() {
 
   const [progress, setProgress] = useState(-100);
 
-  const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined)
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const METEO_PATH = '/data/meteo_swiss_filtered.parquet';
   const STATIONS_PATH = '/data/stations.parquet';
@@ -73,17 +73,25 @@ function App() {
     return { min, max };
   }, [meteoData]);
 
-  const sunshineForDate = useMemo(
-    () => meteoData.filter(d => d.date === selectedDate).map(d => d.sre000d0_7d),
-    [meteoData, selectedDate]
+  const currentDateKey = useMemo(
+    () => (selectedDate ? selectedDate.toISOString().slice(0, 10) : undefined),
+    [selectedDate]
   );
 
   const availableDates = useMemo(
     () =>
-      Array.from(new Set(meteoData.map((d) => d.date))).sort(
+      Array.from(new Set(meteoData.map(d => d.date.toISOString().slice(0, 10)))).sort(
         (a, b) => new Date(a).getTime() - new Date(b).getTime()
       ),
     [meteoData]
+  );
+
+  const sunshineForDate = useMemo(
+    () =>
+      meteoData
+        .filter(d => currentDateKey ? d.date.toISOString().slice(0, 10) === currentDateKey : false)
+        .map(d => d.sre000d0_7d),
+    [meteoData, currentDateKey]
   );
 
   const onScroll = useCallback(() => {
@@ -113,8 +121,8 @@ function App() {
     if (scrollDistance >= 0) return;
     const clampedProgress = Math.max(0, Math.min(1, newProgress))
     const dateIndex = Math.floor(clampedProgress * (availableDates.length - 1))
-    const newDate = availableDates[dateIndex]
-    setSelectedDate(newDate)
+    const key = availableDates[dateIndex];
+    if (key) setSelectedDate(new Date(key + 'T00:00:00Z'));
     setProgress(newProgress)
   }, [availableDates])
 
@@ -127,7 +135,8 @@ function App() {
   useEffect(() => {
     const loadFile = async <T,>(path: string): Promise<T[]> => {
       const file = await asyncBufferFromUrl({ url: path });
-      return parquetReadObjects({ file }) as T[];
+      const rows = await parquetReadObjects({ file });
+      return rows as unknown as T[];
     };
 
     const loadData = async () => {
@@ -209,9 +218,8 @@ function App() {
         </div>
 
         <div
-          className={`story-point story--sunshine ${
-            progress < 0.0 ? 'story-pre' : (progress < 0.95 ? 'story-visible' : 'story-post')
-          }`}
+          className={`story-point story--sunshine ${progress < 0.0 ? 'story-pre' : (progress < 0.95 ? 'story-visible' : 'story-post')
+            }`}
         >
           <SunshineVisualization
             valuesForDate={sunshineForDate}

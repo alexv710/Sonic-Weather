@@ -3,9 +3,6 @@ import DeckGL from '@deck.gl/react';
 import Map from 'react-map-gl/maplibre';
 import * as maplibre from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import type { Station } from '../types/station';
-import type { WeatherRecord } from '../types/weather';
-import type { WeatherDailySummary } from '../types/weatherDailySummary';
 import { ScatterplotLayer } from '@deck.gl/layers';
 
 type MapLibreModule = typeof maplibre & { default?: typeof maplibre }
@@ -29,11 +26,17 @@ export const DEFAULT_VIEW = {
   bearing: 0
 } as const
 
+type Station = { id: string; lon: number; lat: number; title: string; };
+type WeatherRecord = {
+  station_abbr: string;
+  date: Date;
+  rre150d0_7d: number | null;
+};
+
 export interface MapVisualizationProps {
-  stations: Record<string, Station>
-  weather: WeatherRecord[]
-  dailyWeather: WeatherDailySummary[]
-  selectedDate?: Date
+  stations: Record<string, Station>;
+  weather: WeatherRecord[];
+  selectedDate?: Date;
 }
 
 type GlyphDatum = {
@@ -61,14 +64,21 @@ export default function MapVisualization({
   }, [])
 
   const dateKey = useMemo(() => {
-    if (selectedDate) return selectedDate.toISOString().slice(0, 10)
-    if (weather.length) return String(weather[0].date).slice(0, 10)
-    return undefined
-  }, [selectedDate, weather])
+    if (selectedDate) return selectedDate.toISOString().slice(0, 10);
+    if (weather.length) {
+      const d = weather[0].date;
+      return (typeof d === 'string' ? d : d.toISOString()).slice(0, 10);
+    }
+    return undefined;
+  }, [selectedDate, weather]);
 
   const glyphs: GlyphDatum[] = useMemo(() => {
     if (!dateKey) return []
-    const rows = weather.filter((w) => String(w.date.toISOString().slice(0, 10)) === dateKey)
+    const rows = weather.filter((w) => {
+      const d = w.date;
+      const key = (typeof d === 'string' ? d : d.toISOString()).slice(0, 10);
+      return key === dateKey;
+    });
     return rows
       .map((r) => {
         const st = stations[r.station_abbr.toLowerCase()]
@@ -91,34 +101,34 @@ export default function MapVisualization({
   const scatterLayer =
     glyphs.length > 0
       ? new ScatterplotLayer({
-          id: 'rain-rings',
-          data: glyphs.filter((g) => (g.rain ?? 0) > 0),
-          pickable: false,
-          stroked: true,
-          filled: false,
-          radiusUnits: 'meters',
-          lineWidthUnits: 'pixels',
-          lineWidthMinPixels: 2,
-          getLineWidth: (d) => 2 + 6 * ((d.rain ?? 0) / rainMaxSafe),
-          getPosition: (d) => d.position,
-          getLineColor: [70, 130, 180, 200],
-          getRadius: (d) => {
-            const rainRatio = (d.rain ?? 0) / rainMaxSafe
-            const base = 1000
-            const amp  = 8000 * rainRatio
-            const speed = 0.002 + 0.004 * rainRatio
-            const t = time * speed
-            return base + amp * (0.5 + 0.5 * Math.sin(t))
-          },
-          parameters: { depthTest: false }
-        })
+        id: 'rain-rings',
+        data: glyphs.filter((g) => (g.rain ?? 0) > 0),
+        pickable: false,
+        stroked: true,
+        filled: false,
+        radiusUnits: 'meters',
+        lineWidthUnits: 'pixels',
+        lineWidthMinPixels: 2,
+        getLineWidth: (d) => 2 + 6 * ((d.rain ?? 0) / rainMaxSafe),
+        getPosition: (d) => d.position,
+        getLineColor: [70, 130, 180, 200],
+        getRadius: (d) => {
+          const rainRatio = (d.rain ?? 0) / rainMaxSafe
+          const base = 1000
+          const amp = 8000 * rainRatio
+          const speed = 0.002 + 0.004 * rainRatio
+          const t = time * speed
+          return base + amp * (0.5 + 0.5 * Math.sin(t))
+        },
+        parameters: { depthTest: false }
+      })
       : null
 
   const layers = [scatterLayer].filter(Boolean) as any[]
 
   return (
     <DeckGL
-    style={{
+      style={{
         height: '100%',
         width: '100%',
         position: 'relative',

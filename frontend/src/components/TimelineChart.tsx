@@ -12,23 +12,21 @@ import {
   Line
 } from 'recharts'
 
-import type { MusicDaily } from '../types'
-
 export interface TimelineChartProps {
-  data: MusicDaily[]
-  selectedDate?: Date
+  data: Array<{
+    date: Date;
+    energy: number;
+    acousticness: number;
+    danceability: number;
+  }>;
+  selectedDate?: Date;
 }
-
 /**
  * Formats a Unix timestamp (number) for the X-axis ticks.
  */
-function formatTimestamp(timestamp: number) {
+function formatTimestamp(timestamp: number): string {
   const date = new Date(timestamp);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    timeZone: 'UTC'
-  })
+  return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
 }
 
 // --- COVID EVENTS (using Date objects) ---
@@ -44,7 +42,7 @@ export default function TimelineChart({ data, selectedDate }: TimelineChartProps
   const chartData = useMemo(() => {
     return data.map(d => ({
       ...d,
-      date: d.date.getTime()
+      date: d.date.getTime(),
     }));
   }, [data]);
 
